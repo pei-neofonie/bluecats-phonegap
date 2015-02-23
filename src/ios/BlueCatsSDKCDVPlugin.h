@@ -24,4 +24,7 @@
 - (void) scheduleLocalNotification:(CDVInvokedUrlCommand *)command;
 - (void) cancelAllLocalNotifications:(CDVInvokedUrlCommand *)command;
 
+- (void) getAllSites:(CDVInvokedUrlCommand *)command;
+- (void) getAllBeacons:(CDVInvokedUrlCommand *)command;
+
 @end

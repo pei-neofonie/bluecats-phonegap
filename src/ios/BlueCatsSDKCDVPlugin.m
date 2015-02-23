@@ -186,6 +186,32 @@
     [self sendOkClearCallback: command.callbackId];
 }
 
+- (void) getAllSites:(CDVInvokedUrlCommand *)command
+{
+    [[BlueCatsSDK currentApp] getSitesWithSuccess:^(NSArray *sites)
+     {
+         [self sendArray:sites forCallback:command.callbackId keepCallback:YES];
+     }
+                                          failure:^(NSError *error)
+     {
+         [self sendErrorMessage:[error localizedDescription] forCallback:command.callbackId];
+     }
+                                     preferCached:YES];
+}
+
+- (void) getAllBeacons:(CDVInvokedUrlCommand *)command
+{
+    [[BlueCatsSDK currentApp] getBeaconsWithSuccess:^(NSArray *beacons)
+     {
+         [self sendArray:beacons forCallback:command.callbackId keepCallback:YES];
+     }
+                                            failure:^(NSError *error)
+     {
+         [self sendErrorMessage:[error localizedDescription] forCallback:command.callbackId];
+     }
+                                       preferCached:YES];
+}
+
 - (void)didReceiveLocalNotification:(NSNotification *)notification
 {
     [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
