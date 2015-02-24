@@ -190,7 +190,14 @@
 {
     [[BlueCatsSDK currentApp] getSitesWithSuccess:^(NSArray *sites)
      {
-         [self sendArray:sites forCallback:command.callbackId keepCallback:YES];
+         NSMutableArray *siteDictionaries = [NSMutableArray array];
+         
+         for (BCSite *site in sites)
+         {
+             [siteDictionaries addObject:[site toDictionary]];
+         }
+         
+         [self sendArray:[siteDictionaries copy] forCallback:command.callbackId keepCallback:YES];
      }
                                           failure:^(NSError *error)
      {
@@ -203,7 +210,16 @@
 {
     [[BlueCatsSDK currentApp] getBeaconsWithSuccess:^(NSArray *beacons)
      {
-         [self sendArray:beacons forCallback:command.callbackId keepCallback:YES];
+         NSMutableArray *beaconDictionaries = [NSMutableArray array];
+         
+         for (BCBeacon *beacon in beacons)
+         {
+             NSMutableDictionary *beaconDictionary = [[beacon toDictionary] mutableCopy];
+             [beaconDictionary setObject:[self proximityToString:beacon.proximity] forKey:@"proximity"];
+             [beaconDictionaries addObject:beaconDictionary];
+         }
+         
+         [self sendArray:[beaconDictionaries copy] forCallback:command.callbackId keepCallback:YES];
      }
                                             failure:^(NSError *error)
      {

@@ -1,4 +1,4 @@
-cordova.define("com.bluecats.beacons.BlueCatsSDKCDVPlugin", function(require, exports, module) { // API definition for BlueCats SDK Cordova plugin.
+// API definition for BlueCats SDK Cordova plugin.
 //
 // Use jsdoc to generate documentation.
 
@@ -138,5 +138,3 @@ exports.getAllSites = function(success, fail) {
 exports.getAllBeacons = function(success, fail) {
 	exec(success, fail, 'BlueCatsSDKCDVPlugin', 'getAllBeacons', []);
 };
-
-});
