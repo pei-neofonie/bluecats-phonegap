@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.bluecats.sdk.BCAppInsights;
+import com.bluecats.sdk.BCError;
 import com.bluecats.sdk.BCAppCallback;
 import com.bluecats.sdk.BCBeacon;
 import com.bluecats.sdk.BCBeacon.BCProximity;
