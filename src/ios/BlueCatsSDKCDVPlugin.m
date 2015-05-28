@@ -20,14 +20,21 @@
 
 @property NSString* localNotificationReceivedCallbackId;
 @property NSMutableDictionary* eventCallbackIds;
-
+@property NSMutableArray *presentedLocalNotifications;
 @end
 
 @implementation BlueCatsSDKCDVPlugin
 
 -(void)pluginInitialize
 {
+    if ([[UIApplication sharedApplication] respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+        [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound | UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
+    }
+    
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveLocalNotification:) name:CDVLocalNotification object:nil];
+    
+    self.presentedLocalNotifications = [[NSMutableArray alloc] init];
 }
 
 - (void)dealloc
@@ -232,13 +239,36 @@
 {
     [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
     UILocalNotification* localNotification = [notification object];
+    
+    if([self shouldPresentLocationNotification:localNotification]) {
+        [self presentLocalNotification:localNotification];
+    }
+}
+
+- (BOOL)shouldPresentLocationNotification:(UILocalNotification *)notification
+{
+    BOOL shouldPresent = YES;
+    
+    if([self.presentedLocalNotifications containsObject:notification]) {
+        shouldPresent = NO;
+    }
+    
+    return shouldPresent;
+}
+
+- (void)presentLocalNotification:(UILocalNotification *)notification
+{
+    [[UIApplication sharedApplication] presentLocalNotificationNow:notification];
+    
     NSMutableDictionary* data = [[NSMutableDictionary alloc] init];
-    [data setObject:localNotification.userInfo forKey:@"userInfo"];
-    [data setObject:localNotification.alertAction forKey:@"alertAction"];
-    [data setObject:localNotification.alertBody forKey:@"alertBody"];
+    [data setObject:notification.userInfo forKey:@"userInfo"];
+    [data setObject:notification.alertAction forKey:@"alertAction"];
+    [data setObject:notification.alertBody forKey:@"alertBody"];
     if (self.localNotificationReceivedCallbackId) {
         [self sendDictionary:data forCallback:self.localNotificationReceivedCallbackId keepCallback:YES];
     }
+    
+    [self.presentedLocalNotifications addObject:notification];
 }
 
 #pragma mark handle triggered beacon events
@@ -579,8 +609,8 @@
  * Send back an array to Cordova.
  */
 - (void) sendData: (NSArray*)array
-       forCallback: (NSString*)callbackId
-      keepCallback: (BOOL) keep
+      forCallback: (NSString*)callbackId
+     keepCallback: (BOOL) keep
 {
     CDVPluginResult* result = [CDVPluginResult
                                resultWithStatus: CDVCommandStatus_OK
